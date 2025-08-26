@@ -1,5 +1,6 @@
+from django.conf import settings
 from django.db import models
-from django.db.models import RESTRICT
+from django.db.models import RESTRICT, CASCADE
 
 
 class Course(models.Model):
@@ -8,6 +9,7 @@ class Course(models.Model):
     title = models.CharField(max_length=150, null=False, verbose_name="Название")
     preview = models.ImageField(max_length=150, upload_to="media/",verbose_name="превью", null=True, blank=True)
     description = models.TextField(null=True, blank=True, verbose_name="Описание")
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -22,6 +24,7 @@ class Lesson(models.Model):
     description = models.TextField(null=True, blank=True, verbose_name="Описание")
     link_to_video = models.URLField(null=True, blank=True, verbose_name="Ссылка на видео")
     course = models.ForeignKey(Course, verbose_name="Курс" ,on_delete=RESTRICT, null=True, blank=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
