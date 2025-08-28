@@ -1,9 +1,13 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from users.models import Payments, User
+from materials.models import Course
+from users.models import Payments, User, Subscription
 from users.permissions import OwnerOnlyPerm
 from users.serializers import PaymentsSerializer, UserSerializer
 
@@ -40,3 +44,22 @@ class UserDetailAPIView(generics.RetrieveAPIView):
 class UserDeleteAPIView(generics.DestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, OwnerOnlyPerm]
+
+class SubscriptionAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, *args, **kwargs):
+        user = self.request.user
+        course_id = self.request.data.get('course_id')
+        course_item = get_object_or_404(Course, id=course_id)
+
+        subs_item = Subscription.objects.filter(user=user, course=course_item)
+        if subs_item.exists():
+            subs_item.delete()
+            message = 'Подписка удалена'
+        else:
+            Subscription.objects.create(user=user, course=course_item)
+            message = 'Подписка добавлена'
+
+        return Response({'message': message})

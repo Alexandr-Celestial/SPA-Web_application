@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from materials.models import Course, Lesson
+from materials.paginators import SetAllLessonAndCoursePaginator
 from materials.serializers import CourseSerializer, LessonSerializer
 from users.permissions import OwnerOnlyPerm, OwnerOrManagerPerm
 
@@ -20,8 +21,9 @@ class LessonCreateAPIView(generics.CreateAPIView):
 
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
-    queryset = Lesson.objects.all()
+    queryset = Lesson.objects.all().order_by('id')
     permission_classes = [IsAuthenticated]
+    pagination_class = SetAllLessonAndCoursePaginator
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
@@ -35,12 +37,14 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     serializer_class = LessonSerializer
+    queryset = Lesson.objects.all()
     permission_classes = [OwnerOnlyPerm]
 
 class CourseListAPIView(generics.ListAPIView):
-    queryset = Course.objects.all()
+    queryset = Course.objects.all().order_by('id')
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = SetAllLessonAndCoursePaginator
 
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
@@ -70,4 +74,5 @@ class CourseUpdateAPIView(generics.UpdateAPIView):
 
 class CourseDestroyAPIView(generics.DestroyAPIView):
     serializer_class = CourseSerializer
+    queryset = Course.objects.all()
     permission_classes = [OwnerOnlyPerm]
