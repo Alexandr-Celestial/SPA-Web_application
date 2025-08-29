@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CASCADE
 
-from materials.models import Course, Lesson
+# from materials.models import Course, Lesson
 
 
 class User(AbstractUser):
@@ -36,8 +36,8 @@ class Payments(models.Model):
 
     user = models.ForeignKey(User, verbose_name='пользователь', on_delete=CASCADE)
     payment_date = models.DateTimeField(verbose_name='дата оплаты', null=True, blank=True)
-    paid_course = models.ForeignKey(Course, verbose_name='оплаченный курс', on_delete=CASCADE, null=True, blank=True)
-    paid_lesson = models.ForeignKey(Lesson, verbose_name='оплаченный урок', on_delete=CASCADE, null=True, blank=True)
+    paid_course = models.ForeignKey('materials.Course', verbose_name='оплаченный курс', on_delete=CASCADE, null=True, blank=True)
+    paid_lesson = models.ForeignKey('materials.Lesson', verbose_name='оплаченный урок', on_delete=CASCADE, null=True, blank=True)
     payment_amount = models.PositiveIntegerField(verbose_name='сумма оплаты', null=True, blank=True)
     payment_method = models.CharField(max_length=100, choices=PAYMENT_METHOD_CHOICES, verbose_name='способ оплаты',
                                       null=True, blank=True)
@@ -48,3 +48,17 @@ class Payments(models.Model):
     class Meta:
         verbose_name = 'Платеж'
         verbose_name_plural = 'Платежи'
+
+
+class Subscription(models.Model):
+    """Модель подписки"""
+
+    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=CASCADE, null=True, blank=True)
+    course = models.ForeignKey('materials.Course', verbose_name="Курс", on_delete=CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"Подписка пользователя {self.user} на курс {self.course}"
+
+    class Meta:
+        verbose_name = "подписка"
+        verbose_name_plural = "подписки"
