@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -10,6 +11,7 @@ from materials.models import Course
 from users.models import Payments, User, Subscription
 from users.permissions import OwnerOnlyPerm
 from users.serializers import PaymentsSerializer, UserSerializer
+from users.services import create_stripe_price_amount, create_stripe_session
 
 
 class PaymentsListAPIView(generics.ListAPIView):
@@ -63,3 +65,16 @@ class SubscriptionAPIView(APIView):
             message = 'Подписка добавлена'
 
         return Response({'message': message})
+
+class CreateProductPrice(CreateAPIView):
+    serializer_class = PaymentsSerializer
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+        pay = serializer.save(user=self.request.user)
+        price = create_stripe_price_amount(pay.name_product, pay.amount)
+        session_id, session_link = create_stripe_session(price)
+        pay.session_id = session_id
+        pay.link = session_link
+        pay.save()

@@ -36,6 +36,8 @@ class Payments(models.Model):
 
     user = models.ForeignKey(User, verbose_name='пользователь', on_delete=CASCADE)
     payment_date = models.DateTimeField(verbose_name='дата оплаты', null=True, blank=True)
+    session_id = models.TextField(verbose_name='id сессии', null=True, blank=True)
+    link = models.TextField(verbose_name='Ссылка на оплату', null=True, blank=True)
     paid_course = models.ForeignKey('materials.Course', verbose_name='оплаченный курс', on_delete=CASCADE, null=True, blank=True)
     paid_lesson = models.ForeignKey('materials.Lesson', verbose_name='оплаченный урок', on_delete=CASCADE, null=True, blank=True)
     payment_amount = models.PositiveIntegerField(verbose_name='сумма оплаты', null=True, blank=True)
