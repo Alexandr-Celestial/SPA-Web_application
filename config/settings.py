@@ -180,7 +180,7 @@ CELERY_TASK_TIME_LIMIT = 1800
 
 CELERY_BEAT_SCHEDULE = {
     'deactivate_inactive_users_monthly': {
-        'task': 'users.tasks.deactivate_inactive_users',
+        'task': 'users.tasks.deactivated_users',
         'schedule': crontab(hour=0, minute=0, day_of_month='1'),
     },
 }
