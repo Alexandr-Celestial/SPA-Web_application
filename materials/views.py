@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from materials.models import Course, Lesson
 from materials.paginators import SetAllLessonAndCoursePaginator
 from materials.serializers import CourseSerializer, LessonSerializer
+from materials.tasks import send_course_update_mail
 from users.permissions import OwnerOnlyPerm, OwnerOrManagerPerm
 
 
@@ -71,6 +72,10 @@ class CourseUpdateAPIView(generics.UpdateAPIView):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
     permission_classes = [OwnerOrManagerPerm]
+
+    def perform_update(self, serializer):
+        course = serializer.save()
+        send_course_update_mail.delay(course.pk)
 
 class CourseDestroyAPIView(generics.DestroyAPIView):
     serializer_class = CourseSerializer
