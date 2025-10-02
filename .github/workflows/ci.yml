@@ -53,7 +53,9 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install --no-root
+        run: | 
+          poetry lock
+          poetry install --no-root
       - name: Makemigrations
         env:
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
