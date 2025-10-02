@@ -68,9 +68,9 @@ jobs:
       - name: Run tests
         env:
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DATABASE_NAME: spa-web_application
-          DATABASE_USER: postgres
-          DATABASE_PASSWORD: 1234
-          DATABASE_HOST: localhost
-          DATABASE_PORT: 5432
+          DB_NAME: spa-web_application
+          DB_USER: postgres
+          DB_PASSWORD: 1234
+          DB_HOST: localhost
+          DB_PORT: 5432
         run: poetry run python manage.py test
