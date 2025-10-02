@@ -32,4 +32,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.lint.dependencies]
 flake8 = "^7.3.0"
+black = "^25.9.0"
+isort = "^6.1.0"
 

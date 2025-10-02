@@ -18,8 +18,9 @@ class PaymentsListAPIView(generics.ListAPIView):
     serializer_class = PaymentsSerializer
     queryset = Payments.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['paid_course', 'paid_lesson', 'payment_method']
-    ordering_fields = ['payment_date']
+    filterset_fields = ["paid_course", "paid_lesson", "payment_method"]
+    ordering_fields = ["payment_date"]
+
 
 # class MyTokenObtainPairView(TokenObtainPairView):
 #     serializer_class = MyTokenObtainPairSerializer
@@ -34,18 +35,22 @@ class PaymentsListAPIView(generics.ListAPIView):
 class UserCreateAPIView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
+
 class UserUpdateAPIView(generics.UpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, OwnerOnlyPerm]
+
 
 class UserDetailAPIView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, OwnerOnlyPerm]
     queryset = User.objects.all()
 
+
 class UserDeleteAPIView(generics.DestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, OwnerOnlyPerm]
+
 
 class SubscriptionAPIView(APIView):
 
@@ -53,18 +58,19 @@ class SubscriptionAPIView(APIView):
 
     def post(self, *args, **kwargs):
         user = self.request.user
-        course_id = self.request.data.get('course_id')
+        course_id = self.request.data.get("course_id")
         course_item = get_object_or_404(Course, id=course_id)
 
         subs_item = Subscription.objects.filter(user=user, course=course_item)
         if subs_item.exists():
             subs_item.delete()
-            message = 'Подписка удалена'
+            message = "Подписка удалена"
         else:
             Subscription.objects.create(user=user, course=course_item)
-            message = 'Подписка добавлена'
+            message = "Подписка добавлена"
 
-        return Response({'message': message})
+        return Response({"message": message})
+
 
 class CreateProductPrice(CreateAPIView):
     serializer_class = PaymentsSerializer

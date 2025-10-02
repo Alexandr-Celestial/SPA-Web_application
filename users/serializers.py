@@ -12,12 +12,17 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = "__all__"
 
+
 class PaymentsSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Payments"""
 
     user_name = serializers.EmailField(source="user.email", read_only=True)
-    course_name = serializers.CharField(source="course.email", read_only=True, allow_null=True)
-    lesson_name = serializers.CharField(source="lesson.email", read_only=True, allow_null=True)
+    course_name = serializers.CharField(
+        source="course.email", read_only=True, allow_null=True
+    )
+    lesson_name = serializers.CharField(
+        source="lesson.email", read_only=True, allow_null=True
+    )
 
     name_product = serializers.CharField(read_only=True)
     amount = serializers.IntegerField(read_only=True)
@@ -25,6 +30,7 @@ class PaymentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payments
         fields = "__all__"
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod

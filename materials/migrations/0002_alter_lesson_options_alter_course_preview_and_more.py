@@ -6,22 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('materials', '0001_initial'),
+        ("materials", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='lesson',
-            options={'verbose_name': 'урок', 'verbose_name_plural': 'уроки'},
+            name="lesson",
+            options={"verbose_name": "урок", "verbose_name_plural": "уроки"},
         ),
         migrations.AlterField(
-            model_name='course',
-            name='preview',
-            field=models.ImageField(max_length=150, upload_to='media/', verbose_name='превью'),
+            model_name="course",
+            name="preview",
+            field=models.ImageField(
+                max_length=150, upload_to="media/", verbose_name="превью"
+            ),
         ),
         migrations.AlterField(
-            model_name='lesson',
-            name='preview',
-            field=models.ImageField(max_length=150, upload_to='media/', verbose_name='превью'),
+            model_name="lesson",
+            name="preview",
+            field=models.ImageField(
+                max_length=150, upload_to="media/", verbose_name="превью"
+            ),
         ),
     ]
