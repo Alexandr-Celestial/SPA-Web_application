@@ -1,6 +1,6 @@
 name: Django CI/CD Pipeline
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   lint:
@@ -25,3 +25,50 @@ jobs:
           poetry install --only lint --no-root
       - name: Run Flake8
         run: poetry run flake8 .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
+          POSTGRES_DB: spa-web_application
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install --no-root
+      - name: Makemigrations
+        env:
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DB_NAME: spa-web_application
+          DB_USER: postgres
+          DB_PASSWORD: 1234
+          DB_HOST: localhost
+          DB_PORT: 5432
+        run: poetry run python manage.py makemigrations
+      - name: Run tests
+        env:
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DATABASE_NAME: spa-web_application
+          DATABASE_USER: postgres
+          DATABASE_PASSWORD: 1234
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+        run: poetry run python manage.py test
