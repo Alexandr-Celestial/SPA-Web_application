@@ -91,10 +91,19 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
 
       - name: Start ssh-agent and add key with passphrase
+        env:
+          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
         run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
           eval "$(ssh-agent -s)"
-          echo "echo $SSH_PASSPHRASE" > ~/.ssh/ssh_askpass
+
+          echo "echo \"$SSH_PASSPHRASE\"" > ~/.ssh/ssh_askpass
           chmod +x ~/.ssh/ssh_askpass
+
           DISPLAY=:0 SSH_ASKPASS=~/.ssh/ssh_askpass ssh-add ~/.ssh/id_ed25519
 
       - name: Add server to known_hosts
