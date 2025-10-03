@@ -92,7 +92,11 @@ jobs:
 
       - name: Add server to known_hosts
         run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      
 
       - name: Copy project files to server
         run: |
