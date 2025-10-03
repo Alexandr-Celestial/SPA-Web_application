@@ -86,21 +86,18 @@ jobs:
           SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          # Запускаем ssh-agent с явно заданным сокетом
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          # Скрипт, возвращающий пароль ключа
           echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass
           chmod +x ~/.ssh_askpass
-          # Добавляем ключ в ssh-agent с указанием ssh_askpass, отключаем DISPLAY
-          DISPLAY=none SSH_ASKPASS=~/.ssh_askpass ssh-add - <<< "$SSH_PRIVATE_KEY"
-          # Проверяем добавленные ключи
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=none SSH_ASKPASS=~/.ssh_askpass ssh-add - > /dev/null
           ssh-add -l
 
-      - name: Add server to known_hosts
+      - name: Ensure .ssh and known_hosts
         run: |
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-      
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Debug SSH connection with verbose output
         run: |
