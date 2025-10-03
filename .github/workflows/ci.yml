@@ -80,10 +80,21 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/feature/35.2-CI/CD_and_GitHub_Actions'
     steps:
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Setup SSH with passphrase
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          # Запускаем ssh-agent с явно заданным сокетом
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          # Скрипт, возвращающий пароль ключа
+          echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass
+          chmod +x ~/.ssh_askpass
+          # Добавляем ключ в ssh-agent с указанием ssh_askpass, отключаем DISPLAY
+          DISPLAY=none SSH_ASKPASS=~/.ssh_askpass ssh-add - <<< "$SSH_PRIVATE_KEY"
+          # Проверяем добавленные ключи
+          ssh-add -l
 
       - name: Add server to known_hosts
         run: |
