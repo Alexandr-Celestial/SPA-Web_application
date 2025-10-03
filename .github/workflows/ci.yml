@@ -80,32 +80,40 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/feature/35.2-CI/CD_and_GitHub_Actions'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Setup SSH with passphrase
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass
-          chmod +x ~/.ssh_askpass
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=none SSH_ASKPASS=~/.ssh_askpass ssh-add - > /dev/null
-          ssh-add -l
-
-      - name: Ensure .ssh and known_hosts
-        run: |
+          rm -rf ~/.ssh
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
 
-      - name: Debug SSH connection with verbose output
+          echo 'echo $SSH_PASSPHRASE' > ~/.ssh/askpass.sh
+          chmod +x ~/.ssh/askpass.sh
+
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          DISPLAY=none SSH_ASKPASS=~/.ssh/askpass.sh ssh-add ~/.ssh/id_rsa
+          ssh-add -l
+
+      - name: Add server to known_hosts
         run: |
-          ssh -vvv -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo Connection successful" || true
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Debug SSH connection
+        run: ssh -vvv -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo Connection successful" || true
 
       - name: Copy project files to server
         run: |
-          ssh -T -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << "EOF"
+          ssh -T -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
           DEPLOY_DIR="${{ secrets.DEPLOY_DIR }}"
           if [ ! -d "\$DEPLOY_DIR/.git" ]; then
             echo "Cloning repository into \$DEPLOY_DIR..."
