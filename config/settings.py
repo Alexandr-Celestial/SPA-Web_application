@@ -32,7 +32,7 @@ PUBLIC_API_KEY_STRIPE = os.getenv("PUBLIC_API_KEY_STRIPE")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
