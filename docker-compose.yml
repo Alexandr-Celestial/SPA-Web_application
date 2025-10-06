@@ -47,27 +47,25 @@ services:
 
   celery:
     build: .
-    command: celery -A config worker -l INFO
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - .:/SPA-Web_application
     env_file:
       - .env
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    image: SPA-Web_application/celery
+      - db
+      - redis
 
   celery_beat:
     build: .
-    command: celery -A config beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: celery -A config beat --loglevel=info
+    volumes:
+      - .:/SPA-Web_application
     env_file:
       - .env
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    image: SPA-Web_application/celery_beat
+      - db
+      - redis
 
 volumes:
   postgres_data:
