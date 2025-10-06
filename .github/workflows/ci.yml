@@ -168,7 +168,7 @@ jobs:
         run: |
           ssh -T -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << "EOF"
           cd "${{ secrets.DEPLOY_DIR }}"
-          docker compose down
-          docker compose up --build
+          sudo docker compose down
+          sudo docker compose up --build
           echo "Application started in background"
           EOF
