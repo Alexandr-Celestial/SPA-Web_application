@@ -6,18 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0004_subscription'),
+        ("users", "0004_subscription"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='payments',
-            name='link',
-            field=models.TextField(blank=True, null=True, verbose_name='Ссылка на оплату'),
+            model_name="payments",
+            name="link",
+            field=models.TextField(
+                blank=True, null=True, verbose_name="Ссылка на оплату"
+            ),
         ),
         migrations.AddField(
-            model_name='payments',
-            name='session_id',
-            field=models.TextField(blank=True, null=True, verbose_name='id сессии'),
+            model_name="payments",
+            name="session_id",
+            field=models.TextField(blank=True, null=True, verbose_name="id сессии"),
         ),
     ]

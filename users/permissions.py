@@ -2,7 +2,8 @@ from rest_framework.permissions import BasePermission
 
 
 class OwnerOrManagerPerm(BasePermission):
-    """ Разрешения на обновление. """
+    """Разрешения на обновление."""
+
     def has_permission(self, request, view):
         if request.user.is_staff:
             return True
@@ -10,6 +11,7 @@ class OwnerOrManagerPerm(BasePermission):
 
 
 class OwnerOnlyPerm(BasePermission):
-    """ Разрешения на обновление. """
+    """Разрешения на обновление."""
+
     def has_permission(self, request, view):
         return request.user == view.get_object().owner
